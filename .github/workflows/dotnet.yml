@@ -2,32 +2,51 @@ name: .NET
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   build:
-
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    - name: Setup .NET SDK 6.0
+      uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: '6.0.x' 
 
-    - name: Restore dependencies
-      run: dotnet restore
-      working-directory: AuthMicroservice
+    - name: Install dotnet ef
+      run: dotnet tool install --global dotnet-ef
+
+    - name: Install dependencies
+      run: dotnet restore WebApiConcesionario.sln
 
     - name: Build
-      run: dotnet build --no-restore
-      working-directory: ./AuthMicroservice
+      run: dotnet build WebApiConcesionario.sln --configuration Release --no-restore
+      
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server
+        ports:
+          - 1433:1433
+        env:
+          SA_PASSWORD: Your_password123
+          ACCEPT_EULA: Y
+    steps:
+      - uses: actions/checkout@v2
 
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-      working-directory: ./AuthMicroservice
+      - name: Setup .NET SDK 6.0
+        uses: actions/setup-dotnet@v1
+        with:
+            dotnet-version: '6.0.x' 
+
+      - name: run tests
+        run: dotnet test WebApiConcesionario.sln --configuration Release
+        env:
+          ConnectionStrings__DefaultConnection: Server=.;Database=CleanArchitectureTestDb;User=sa;Password=Your_password123;MultipleActiveResultSets=true
