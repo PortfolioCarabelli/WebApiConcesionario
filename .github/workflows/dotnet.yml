@@ -22,7 +22,7 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: ./AuthMicroservice
+      working-directory: AuthMicroservice
 
     - name: Build
       run: dotnet build --no-restore
