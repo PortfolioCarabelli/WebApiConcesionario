@@ -8,19 +8,20 @@ on:
 
 jobs:
   build:
-    name: Build
+
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
     - name: Setup .NET SDK 6.0
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x' 
 
-    - name: Install dependencies
-      run: dotnet restore WebApiConcesionario.sln
+    - name: Restore dependencies
+      run: dotnet restore AuthMicroservice/WebApiConcesionario.sln
 
     - name: Build
-      run: dotnet build WebApiConcesionario.sln --configuration Release --no-restore
-      
+      run: dotnet build AuthMicroservice/WebApiConcesionario.sln --configuration Release --no-restore
